@@ -1094,15 +1094,15 @@ function getInterface(v) {
     };
     _.cmd = function(cmd) {
       var ctrlr = this.__controller.notify(), cursor = ctrlr.cursor;
-      // Special case for textcolor/class
+      // Special case for textcolor/class: 2 arguments
       var isTextColor = /^\\(textcolor|class){(.*?)}/i;
-      if(cursor && cursor.parent && cursor.parent.jQ.is(".mq-text-mode")) {
-        if(cmd === "\\text") {
-          // .cmd doesn't work inside text mode
-          cursor.clearSelection().show();
-          return this;
-        }
-      }
+      // if(cursor && cursor.parent && cursor.parent.jQ.is(".mq-text-mode")) {
+      //   if(cmd === "\\text") {
+      //     // .cmd doesn't work inside text mode
+      //     cursor.clearSelection().show();
+      //     return this;
+      //   }
+      // }
       
       if(isTextColor.test(cmd)) {
         var multimatch = isTextColor.exec(cmd);
@@ -2180,7 +2180,7 @@ Controller.open(function(_, super_) {
   _.renderLatexText = function(latex) {
     var root = this.root, cursor = this.cursor;
 
-    root.jQ.children().slice(1).remove();
+    root.jQ.children().remove();
     root.eachChild('postOrder', 'dispose');
     root.ends[L] = root.ends[R] = 0;
     delete cursor.selection;
@@ -4359,7 +4359,7 @@ LatexCmds.stackrel = P(MathCommand, function(_, super_) {
 // [SitePoint docs]: http://reference.sitepoint.com/css/colorvalues
 // [Mozilla docs]: https://developer.mozilla.org/en-US/docs/CSS/color_value#Values
 // [W3C spec]: http://dev.w3.org/csswg/css3-color/#colorunits
-var TextColor = LatexCmds.textcolor = P(MathCommand, function(_, super_) {
+LatexCmds.textcolor = P(MathCommand, function(_, super_) {
   _.setColor = function(color) {
     this.color = color;
     this.htmlTemplate =
@@ -4393,7 +4393,7 @@ var TextColor = LatexCmds.textcolor = P(MathCommand, function(_, super_) {
 // Usage: \class{classname}{math}
 // Note regex that whitelists valid CSS classname characters:
 // https://github.com/mathquill/mathquill/pull/191#discussion_r4327442
-var Class = LatexCmds['class'] = P(MathCommand, function(_, super_) {
+LatexCmds['class'] = P(MathCommand, function(_, super_) {
   _.setClass = function(cls) {
     this.cls = cls || '';
     this.htmlTemplate =
@@ -5979,7 +5979,6 @@ var TabularCell = P(MathBlock, function(_, super_) {
  * Input box to type backslash commands
  ***************************************/
 
-var LatexCommandInput =
 CharCmds['\\'] = P(MathCommand, function(_, super_) {
   _.ctrlSeq = '\\';
   _.replaces = function(replacedFragment) {

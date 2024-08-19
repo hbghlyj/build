@@ -1,3 +1,4 @@
+import jQuery from "https://cdn.jsdelivr.net/npm/jquery/+esm"
 /**
  * MathQuill v0.10.1, by Han, Jeanine, and Mary
  * http://mathquill.com | maintainers@mathquill.com
@@ -10,9 +11,7 @@
 
 (function() {
 
-var jQuery = window.jQuery,
-  undefined,
-  mqCmdId = 'mathquill-command-id',
+var mqCmdId = 'mathquill-command-id',
   mqBlockId = 'mathquill-block-id',
   min = Math.min,
   max = Math.max;
@@ -5765,3 +5764,4 @@ for (var key in MQ1) (function(key, val) {
 }(key, MQ1[key]));
 
 }());
+export default MathQuill;

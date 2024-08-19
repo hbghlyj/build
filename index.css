@@ -1,0 +1,292 @@
+/*
+Copied from persus project
+*/
+.math-input-buttons.absolute {
+  left: -2px;
+  position: absolute;
+  top: 50px;
+  z-index: 101;
+}
+.tex-button {
+  display: block;
+  float: left;
+  width: 42px;
+  height: 42px;
+  margin: 2px;
+  border: 1px solid #1c758a;
+  background-color: white;
+  border-radius: 5px;
+}
+.tex-button:hover {
+  cursor: pointer;
+  background-color: #f0f0f0;
+}
+.tex-button:focus {
+  border: 2px solid #1c758a;
+outline: none;
+}
+.tex-button-row {
+margin: 5px 0;
+}
+.tex-button-row:first-child {
+margin-top: 0;
+}
+.tex-button-row:last-child {
+margin-bottom: 0;
+}
+/*
+end of styles copied from perseus
+*/
+
+
+.math-buttons-current-panel {
+    margin-top: 10px;
+    width: 475px;
+    float: left;
+}
+.fm-button-light {
+  border: 2px solid transparent;
+  display: inline-block;
+  margin: 2px;
+  padding: 0px 8px 0px 8px;
+  background-color: white;
+  font-size: 12px;
+  font-weight: 600;
+  color: #212121;
+  border-radius: 15px;
+}
+
+.fm-button-light:hover {
+  cursor: pointer;
+  background-color: #f2f2f2;
+}
+.fm-button-light:focus {
+  border: 2px solid #ffa535;
+  outline: none;
+}
+
+.fm-button-light:disabled {
+  background-color: #eaeaea;
+}
+
+.fm-button-grey {
+  border: 2px solid transparent;
+  padding: 4px 8px;
+  margin: 4px;
+  background-color: gray;
+  color: #f1f1f1;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.fm-button-grey:disabled {
+  background-color: #eaeaea;
+  color: #212121;
+}
+
+a.fm-button-grey:hover
+{
+  cursor: pointer;
+  background-color: #3b3b3b;
+  color: #f1f1f1;
+}
+
+.fm-button-grey:hover:enabled
+{
+  cursor: pointer;
+  background-color: #3b3b3b;
+}
+
+.fm-button-grey:focus {
+  border: 2px solid #ffa535;
+  outline:0;
+}
+
+.fm-button-grey:active {
+  transform: scale(0.99);
+}
+
+.fm-button-with-icon {
+    height: 58px;
+    width: 52px
+}
+
+.fm-button-icon {
+    margin-top: 3px;
+    height: 30px
+}
+
+.fm-button {
+  border: 2px solid transparent;
+  padding: 4px 6px;
+  margin: 4px;
+  background-color: #0d57bf;
+  color: #f1f1f1;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.fm-button:disabled {
+  background-color: #eaeaea;
+  color: #212121;
+}
+
+.fm-button-green:hover:enabled
+{
+  cursor: pointer;
+  background-color: #052d66;
+}
+
+
+a.fm-button:hover
+{
+  cursor: pointer;
+  background-color: #052d66;
+  color: #f1f1f1;
+}
+
+.fm-button:hover:enabled
+{
+  cursor: pointer;
+  background-color: #052d66;
+}
+
+.fm-button:focus {
+  border: 2px solid #ffa535;
+  outline:0;
+}
+
+.fm-button:active {
+  transform: scale(0.99);
+}
+
+.fm-button-green {
+    background-color: #008000
+}
+
+.fm-button-green:hover:enabled
+{
+  cursor: pointer;
+  background-color: #005000
+}
+
+.fm-button-left {
+  border: 2px solid transparent;
+  padding: 4px 4px 4px 8px;
+  margin-left: 1px;
+  margin-right: 0px;
+  color: #111111;
+  border-top-left-radius: 15px;
+  border-bottom-left-radius: 15px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.fm-button-left:focus {
+  border-left: 2px solid #ffa535;
+  border-top: 2px solid #ffa535;
+  border-top: 2px solid #ffa535;
+  outline:0;
+}
+
+.fm-button-right {
+  border: 2px solid transparent;
+  padding: 4px 8px 4px 4px;
+  margin-right: 1px;
+  margin-left: 0px;
+  color: #111111;
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.fm-tab {
+  background-color: #e1e1e1
+}
+
+.fm-tab:hover:enabled {
+  background-color: #919191
+}
+
+.fm-tab-selected {
+  background-color: #b1b1b1
+}
+
+
+.fm-button-selected {
+  background-color: #052d66
+}
+
+.fm-button-selected:hover {
+  background-color: #011024
+}
+
+.fm-close-button {
+  border: 2px solid transparent;
+  float: right;
+  display: inline-block;
+  height: 20px;
+  margin: 2px;
+  padding: 3px 6px 20px 6px;
+  background-color: white;
+  border: 1px solid #d1d1d1;
+  color: #414141;
+  border-radius: 3px;
+}
+.fm-close-button:hover {
+  cursor: pointer;
+  background-color: #e0e0e0;
+}
+.fm-close-button:focus {
+  border: 2px solid #ffa535;
+  outline: none;
+}
+
+.wide-tex-button {
+    width:90px
+}
+
+@media (max-width: 640px) {
+    .math-input-buttons {
+        background-color: rgba(245, 245, 245, 0.9);
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        box-sizing: border-box;
+        margin-top: 5px;
+        padding: 10px;
+        width: 601px;
+    }
+    .matrix-end-caps-and-buttons {
+        max-width: 100px
+    }
+
+    .math-buttons-current-panel {
+        width: 400px;
+    }
+    .math-input-buttons.absolute {
+      left: -60px;
+      right: -200px;
+      position: absolute;
+      top: -3px;
+      z-index: 101;
+    }
+}
+
+@media (min-width: 641px) {
+    .math-input-buttons {
+        background-color: rgba(245, 245, 245, 0.9);
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        box-sizing: border-box;
+        margin-top: 5px;
+        padding: 10px;
+        width: 701px;
+    }
+}

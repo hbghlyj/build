@@ -1,12 +1,11 @@
+import jQuery from "https://cdn.jsdelivr.net/npm/jquery/+esm"
 /**
  * FreeMath branch https://github.com/mathquill/mathquill/commit/2199664
  */
 
 (function() {
 
-var jQuery = window.jQuery,
-  undefined,
-  mqCmdId = 'mathquill-command-id',
+var mqCmdId = 'mathquill-command-id',
   mqBlockId = 'mathquill-block-id',
   min = Math.min,
   max = Math.max;
@@ -5669,3 +5668,4 @@ for (var key in MQ1) (function(key, val) {
 }(key, MQ1[key]));
 
 }());
+export default MathQuill;
