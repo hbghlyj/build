@@ -1096,13 +1096,6 @@ function getInterface(v) {
       var ctrlr = this.__controller.notify(), cursor = ctrlr.cursor;
       // Special case for textcolor/class: 2 arguments
       var isTextColor = /^\\(textcolor|class){(.*?)}/i;
-      // if(cursor && cursor.parent && cursor.parent.jQ.is(".mq-text-mode")) {
-      //   if(cmd === "\\text") {
-      //     // .cmd doesn't work inside text mode
-      //     cursor.clearSelection().show();
-      //     return this;
-      //   }
-      // }
       
       if(isTextColor.test(cmd)) {
         var multimatch = isTextColor.exec(cmd);
@@ -1111,7 +1104,7 @@ function getInterface(v) {
         if(klass === "textcolor") {
           var left = cursor.selection && cursor.selection.ends[L];
           var right = cursor.selection && cursor.selection.ends[R];
-          if(left && right && left === right && left.ctrlSeq === "textcolor") {
+          if(left && right && left === right && left.ctrlSeq === "textcolor") {// the selection is collapsed
             left.setColor(multimatch[2]);
             left.jQ.css("color", multimatch[2]);
             ctrlr.handle("edit");
@@ -1126,6 +1119,39 @@ function getInterface(v) {
           this.__controller.scrollHoriz();
           ctrlr.handle("edit");
         return this;
+      }
+      if(cursor && cursor.parent && cursor.parent.jQ.is(".mq-text-mode")) {// inside text mode
+        switch(cmd){
+          case "\\textbf":
+          case "\\textit":
+          cmd = cmd.slice(1);
+          var klass = LatexCmds[cmd];
+          cmd = klass(cmd);
+          if (cursor.selection) cmd.replaces(cursor.replaceSelection());
+            if (!cursor[R]) { // at right end of text block
+              cursor.insRightOf(cursor.parent);
+              cmd.createLeftOf(cursor.show());
+            } else if (!cursor[L]) { // at left end of text block
+              cursor.insLeftOf(cursor.parent);
+              cmd.createLeftOf(cursor.show());
+            } else { // split apart
+              var leftBlock = cursor.parent.constructor();// create a new TextBlock, preserving the current formatting (textit/textbf)
+              var leftPc = cursor.parent.ends[L];
+              leftPc.disown().jQ.detach();
+              leftPc.adopt(leftBlock, 0, 0);
+
+              cursor.insLeftOf(cursor.parent);
+              leftBlock.createLeftOf(cursor.show());
+              // Now cursor.parent is leftBlock
+              cursor.insRightOf(cursor.parent);
+              cmd.createLeftOf(cursor.show());
+            }
+            ctrlr.handle("edit");
+            return this;
+          default:
+            cursor.clearSelection().show();
+            return this;
+        }
       }
       if (/^\\[a-z]+/i.test(cmd)) {
         cmd = cmd.slice(1);
@@ -2142,7 +2168,7 @@ Controller.open(function(_, super_) {
       block.finalizeInsert(cursor.options, cursor);
       if (block.ends[R][R].siblingCreated) block.ends[R][R].siblingCreated(cursor.options, L);
       if (block.ends[L][L].siblingCreated) block.ends[L][L].siblingCreated(cursor.options, R);
-      cursor.parent.bubble('reflow');
+      //cursor.parent.bubble('reflow');//don't call edit handler for programmatic changes(e.g. Undo/Redo), only for user input, to avoid infinite loops
     }
 
     return this;
@@ -2496,10 +2522,10 @@ var MathElement = P(Node, function(_, super_) {
     // correctly by 'reflow' handlers.
     self.postOrder('blur');
 
-    self.postOrder('reflow');
+    // self.postOrder('reflow');//don't call edit handler for programmatic changes(e.g. Undo/Redo), only for user input, to avoid infinite loops
     if (self[R].siblingCreated) self[R].siblingCreated(options, L);
     if (self[L].siblingCreated) self[L].siblingCreated(options, R);
-    self.bubble('reflow');
+    // self.bubble('reflow');//don't call edit handler for programmatic changes(e.g. Undo/Redo), only for user input, to avoid infinite loops
   };
 });
 
@@ -3251,35 +3277,25 @@ var TextPiece = P(Node, function(_, super_) {
     return this.deleteTowards(dir, cursor);
   };
 });
-CharCmds.$ =
-LatexCmds.text =
-LatexCmds.textnormal =
-LatexCmds.textrm =
-LatexCmds.textup =
-LatexCmds.textmd = TextBlock;
+CharCmds.$ = LatexCmds.text = TextBlock;
 
-function makeTextBlock(latex, tagName, attrs) {
-  return P(TextBlock, {
-    ctrlSeq: latex,
-    htmlTemplate: '<'+tagName+' '+attrs+'>&0</'+tagName+'>'
+function makeTextBlock(latex, attrs) {
+  return P(TextBlock, function(_, super_) {
+    _.ctrlSeq = latex;
+    _.htmlTemplate = '<span '+attrs+'>&0</span>';
+    _.deleteOutOf = function(dir, cursor) {// turn it into a vanilla text block
+      this.ctrlSeq = super_.ctrlSeq;
+      this.jQ.removeAttr('style');
+      this.jQ.attr('class', 'mq-text-mode');
+      super_.deleteOutOf.call(this, dir, cursor);
+    }
   });
 }
 
-LatexCmds.em = LatexCmds.italic = LatexCmds.italics =
-LatexCmds.emph = LatexCmds.textit = LatexCmds.textsl =
-  makeTextBlock('\\textit', 'i', 'class="mq-text-mode"');
-LatexCmds.strong = LatexCmds.bold = LatexCmds.textbf =
-  makeTextBlock('\\textbf', 'b', 'class="mq-text-mode"');
-LatexCmds.sf = LatexCmds.textsf =
-  makeTextBlock('\\textsf', 'span', 'class="mq-sans-serif mq-text-mode"');
-LatexCmds.tt = LatexCmds.texttt =
-  makeTextBlock('\\texttt', 'span', 'class="mq-monospace mq-text-mode"');
-LatexCmds.textsc =
-  makeTextBlock('\\textsc', 'span', 'style="font-variant:small-caps" class="mq-text-mode"');
-LatexCmds.uppercase =
-  makeTextBlock('\\uppercase', 'span', 'style="text-transform:uppercase" class="mq-text-mode"');
-LatexCmds.lowercase =
-  makeTextBlock('\\lowercase', 'span', 'style="text-transform:lowercase" class="mq-text-mode"');
+LatexCmds.textit = makeTextBlock('\\textit', 'style="font-style:italic" class="mq-text-mode"');
+LatexCmds.textbf = makeTextBlock('\\textbf', 'style="font-weight:bold" class="mq-text-mode"');
+LatexCmds.textsf = makeTextBlock('\\textsf', 'class="mq-sans-serif mq-text-mode"');
+LatexCmds.texttt = makeTextBlock('\\texttt', 'class="mq-monospace mq-text-mode"');
 
 
 var RootMathCommand = P(MathCommand, function(_, super_) {

@@ -3,8 +3,8 @@ import _ from "https://esm.sh/underscore?dev";
 import React from "https://esm.sh/react?dev";
 import ReactDOM from "https://esm.sh/react-dom/client?dev";
 import jQuery from "https://esm.sh/jquery?dev";
-import MathQuill from "/build/mathquill_2591d24 - Copy.js";
-window.MathQuill = MathQuill.getInterface(2);
+import MathQuillv1 from "/build/mathquill_2591d24 - Copy.js";
+window.MathQuill = MathQuillv1.getInterface(2);
 const symbolGroups = {
     BASIC : [
         {toType:"+", tex:"+"},
@@ -467,35 +467,6 @@ function TexButtons({onInsert,className}) {
         </button>;
     });
 
-
-    const textButton = () => {
-        return (
-                <button type="button" title={"\\text [Enter]"} className="tex-button"
-                    style={{display: "inline-block", float: "none", width: "50px"}}
-                            onClick={() => {
-                        onInsert(input => {
-                            input.cmd("\\text");
-                        });
-                    }}>
-                    <div style={{display: "inline-block", padding: "3px",fontSize:"16px"}}>Text</div>
-                </button>
-        );
-    }
-
-    const backspaceButton = () => {
-        return (
-                <button type="button" className="tex-button wide-tex-button" style={{display: "inline-block", float: "none"}}
-                            onClick={() => {
-                        onInsert(input => {
-                            input.keystroke("Backspace");
-                        });
-                    }}>
-                    <div style={{display: "inline-block", padding: "3px",fontSize:"16px"}}>Backspace</div>
-                </button>
-        );
-
-    };
-
     const arrowKeys = () => {
         return (
             <table style={{borderCollapse:"collapse"}}>
@@ -602,9 +573,17 @@ function TexButtons({onInsert,className}) {
         <div>
         <div className="homepage-disappear-mobile" style={{display: "inline-block", verticalAlign:"top"}}>
             <div>
-                {_.map([1,2,3,4,5,6,7,8,9,0], number => {
-                    // create a (component, thing we should send to MathQuill) pair
-                    return singleCharButton(number);
+                {singleCharButton('🟥',input => {
+                    input.cmd("\\textcolor{#f8312f}");
+                })}
+                {singleCharButton('🟩',input => {
+                    input.cmd("\\textcolor{#00d26a}");
+                })}
+                {singleCharButton('𝐁',input => {
+                    input.cmd("\\textbf");
+                })}
+                {singleCharButton('𝐼',input => {
+                    input.cmd("\\textit");
                 })}
             </div>
         </div>
@@ -618,8 +597,6 @@ function TexButtons({onInsert,className}) {
 
         </div>
         <div style={{float: 'left', marginTop: '10px'}}>
-            {textButton()}
-            {backspaceButton()}
             <div style={{display: 'block'}}>
                 {_.map(['a','b','c'], letter => {
                     // create a (component, thing we should send to MathQuill) pair
@@ -638,13 +615,14 @@ function TexButtons({onInsert,className}) {
     </div>;
 }
 function MathInput() {
-    const [value, setValue] = React.useState(<?php if (isset($post)) echo json_encode($post['latex']);?>);
     const [focused, setFocus] = React.useState(false);
     const [state, setState] = React.useState({UNDO_STACK : [], REDO_STACK : []});
-    const Textarea = React.createRef();
+    const inputRef = React.useRef();
+    const spanRef = React.useRef();
+    const Textarea = React.useRef();
     React.useEffect(() => {
-        inputRef.current.textContent = value;
-        window.mathField=MathQuill.TextField(inputRef.current,{
+        inputRef.current.value=spanRef.current.textContent=<?php if (isset($post)) echo json_encode(str_replace("\r\n", "\n",$post['latex']));else echo '""';?>;
+        window.mathField=MathQuill.TextField(spanRef.current,{
             // The name of this option is somewhat misleading, as tabbing in
             // MathQuill breaks you out of a nested context (fraction/script)
             // if you're in one, but moves focus to the next input if you're
@@ -666,9 +644,11 @@ function MathInput() {
             handlers: {
                 edit: mathfield=> {
         const newContent = mathfield.latex();
-        console.log((newContent === value)?'no change':'new content: '+newContent);
-        if(newContent === value) return;
+        const currentContent = inputRef.current.value;//setState() does not immediately mutate this.state but creates a pending state transition. Accessing this.state after calling this method can potentially return the existing value. Therefore we don't useState, instead we set value of <input>, so that we don't need to worry about the value of inputRef.current.value being stale.
+        console.log((newContent === currentContent)?'nothing changed!':'new content: '+newContent);
+        if (newContent === currentContent) return;
         const latestUndo = state['UNDO_STACK'].length > 0 ? state['UNDO_STACK'][0] : false;
+        if(latestUndo?.value===newContent) return;
         var editType;// "ADD" or "DELETE"
         var pos;// position of the add or delete
         var updateLastUndoAction = false;
@@ -676,11 +656,11 @@ function MathInput() {
         // event for each character typed, collapse them together.
         // when users type into a textbox, they expect an undo/redo function to remove/add series of characters that were typed/deleted not an individual undo/redo action for each 1 character edit. This functionality is implemented by looking at the type of edit is currently being done, and checking if it should be combined with the last undo event on the stack.
         // Check if this is a single character edit. If it is find its location, and detemine if it is an insertion or deletion
-        if (Math.abs(value.length - newContent.length) === 1) {
+        if (Math.abs(currentContent.length - newContent.length) === 1) {
             // find the first mismatching character
             var i = 0;
-            for (; i < value.length && i < newContent.length; i++) {
-                if (newContent.charAt(i) === value.charAt(i)) continue;
+            for (; i < currentContent.length && i < newContent.length; i++) {
+                if (newContent.charAt(i) === currentContent.charAt(i)) continue;
                 else break;
             }
 
@@ -689,102 +669,76 @@ function MathInput() {
             // tricky case to check, highlight multiple characters and paste in the number of chracters that was highlighted
             // this might cause some weird behavior if the strings overlap, but if data is replaced by mostly the same values there really isn't info lost if it acts somewhat like typing the text out in series
 
-            if (newContent.length > value.length) {
-                // one character addition
+            if (newContent.length > currentContent.length) {
                 if (i === newContent.length - 1
-                        || newContent.substring(i+1) === value.substring(i)) {
+                        || newContent.substring(i+1) === currentContent.substring(i)) {
                     pos = i;
-                    editType = 'ADD';
-                    if (latestUndo && latestUndo['INVERSE_ACTION']['EDIT_TYPE'] === editType
-                            && latestUndo['INVERSE_ACTION']['POS'] === pos - 1) {
+                    editType = 'INSERT';
+                    if (latestUndo && latestUndo['INVERSE_ACTION']['EDIT_TYPE'] === editType// last edit is insertion
+                    && latestUndo['INVERSE_ACTION']['POS'] === pos - 1// continue inserting from that position
+                    ) {
                         updateLastUndoAction = true;
                     }
                 }
             } else {
-                // one character deletion
-                if (i === value.length - 1
-                        || value.substring(i+1) === newContent.substring(i)) {
+                if (i === currentContent.length - 1
+                        || currentContent.substring(i+1) === newContent.substring(i)) {
                     pos = i;
                     editType = 'DELETE';
-                    if (latestUndo && latestUndo['INVERSE_ACTION']['EDIT_TYPE'] === editType
-                            && latestUndo['INVERSE_ACTION']['POS'] === pos + 1) {
+                    if (latestUndo && latestUndo['INVERSE_ACTION']['EDIT_TYPE'] === editType// last edit is deletion
+                    && latestUndo['INVERSE_ACTION']['POS'] === pos + 1// continue deleting from that position
+                    ) {
                         updateLastUndoAction = true;
                     }
                 }
             }
-        } else {
-            updateLastUndoAction = false;
         }
-
-        let inverseAction = {
+        const newUndo = {
             INVERSE_ACTION : {
-                INVERSE_ACTION : {
-                    EDIT_TYPE : editType,
-                    POS : pos,
-                }
-            }
+                EDIT_TYPE : editType,
+                POS : pos,
+            },
+            value: updateLastUndoAction?latestUndo.value:currentContent
         };
-        var newUndoStack;
-        if (updateLastUndoAction) {
-            inverseAction['INVERSE_ACTION'].value = latestUndo.value;
-            let undoAction = {...inverseAction['INVERSE_ACTION']};
-            newUndoStack = [
-                undoAction,
-                ...state['UNDO_STACK'].slice(1)
-            ];
+        state['REDO_STACK'] = [];// Any edit should clear the redo stack (because you are back in history and making a new edit, you need to start tracking this branch in time)
+        if(updateLastUndoAction) {
+            state['UNDO_STACK'][0]=newUndo;
         } else {
-            inverseAction['INVERSE_ACTION'].value = value;
-            let undoAction = {...inverseAction['INVERSE_ACTION']};
-            newUndoStack = [
-                undoAction,
-                ...state['UNDO_STACK']
-            ];
+            state['UNDO_STACK'].unshift(newUndo);
         }
-        setValue(newContent);
-        setState({UNDO_STACK : newUndoStack, REDO_STACK : []});
+        inputRef.current.value=newContent;
+        console.log('Undo stack:',state['UNDO_STACK'],'Redo stack:',state['REDO_STACK']);
     }
             }
         });
     },[]);//Giving it an empty array acts like componentDidMount as in, it only runs once.
-    const inputRef = React.useRef(null);
     return <div style={{display: 'inline-block',verticalAlign:'text-top'}} onKeyUp={function(event) {
         if (!event.ctrlKey) return;
         switch (event.key) {
             case 'z':
-            if (state['UNDO_STACK'].length === 0) return state;
-            let undoAction = state['UNDO_STACK'][0],
-            inverseAction = {...undoAction['INVERSE_ACTION'],
-                                INVERSE_ACTION : {...undoAction, INVERSE_ACTION : undefined}},
-            newUndoStack = state['UNDO_STACK'].slice(1);console.log('undo',state);
-            window.mathField.latex(undoAction.value);
-            setValue(undoAction.value);
-            setState({UNDO_STACK : newUndoStack,REDO_STACK : [
-                    inverseAction,
-                    ...state['REDO_STACK']
-                ]});
+            if (state['UNDO_STACK'].length === 0||state['UNDO_STACK'].length === 1 && state['UNDO_STACK'][0].value===inputRef.current.value) return snackbar('Nothing to undo');
+            const currentState = (state['UNDO_STACK'][0].value!==inputRef.current.value)
+            ?{value:inputRef.current.value,'INVERSE_ACTION':{}}//if the undo stack is not in sync with the current value, then the current value is not in the undo stack, so add it to the undo stack then move it to the redo stack (equivalent to adding the current value to the redo stack)
+            :state['UNDO_STACK'].shift();//if the undo stack is in sync with the current value, then the current value is in the undo stack, so move it to the redo stack
+            state['REDO_STACK'].unshift(currentState);//next time you redo, you will recover the current state
+            window.mathField.latex(inputRef.current.value=state['UNDO_STACK'][0].value);
+            snackbar('Undo');
+            console.log('undo stack=',state['UNDO_STACK'],'redo stack=',state['REDO_STACK']);
             break;
             case 'y':
-            if (state['REDO_STACK'].length === 0) return state;
-            let redoAction = state['REDO_STACK'][0];
-            // this ret has its redo-actions set incorrectly now, because the actions are re-used
-            // in a normal mutation any edit should clear the redo stack (because you are back
-            // in history and making a new edit, you need to start tracking this branch in time)
-            // For redo actions, the stack should be maintained, this is restored below.
-            inverseAction = {...redoAction['INVERSE_ACTION'], INVERSE_ACTION : redoAction};
-            window.mathField.latex(redoAction.value);
-            setValue(redoAction.value);
-            setState({UNDO_STACK : [
-                    inverseAction,
-                    ...state['UNDO_STACK']
-                ],
-                REDO_STACK : state['REDO_STACK'].slice(1, state['REDO_STACK'].length),
-            });
+            if (state['REDO_STACK'].length === 0) return snackbar('Nothing to redo');
+            const redoAction = state['REDO_STACK'].shift();
+            window.mathField.latex(inputRef.current.value=redoAction.value);
+            delete redoAction['INVERSE_ACTION']['EDIT_TYPE'];// this state has its redo-actions set incorrectly now, because the actions are re-used, we don't want to re-use the edit type
+            state['UNDO_STACK'].unshift(redoAction);
+            snackbar('Redo');
+            console.log('undo stack=',state['UNDO_STACK'],'redo stack=',state['REDO_STACK']);
         }
         }}>
         <div style={{overflow: 'auto', display: 'inline-block'}}>
             <textarea ref={Textarea} onFocus={()=>setFocus(true)} onBlur={e=>{if(!e.target.parentNode.parentNode.parentNode.parentNode.contains(e.relatedTarget))setFocus(false)}} />
-            <span ref={inputRef} style={{minWidth:'200px',padding:'5px',margin:'2px'}}/>
-            <input name="latex" type="hidden" value={value} />
+            <span ref={spanRef} style={{minWidth:'200px',padding:'5px',margin:'2px'}}/>
+            <input ref={inputRef} name="latex" type="hidden"/>
         </div>
         {focused&&<div style={{position: "relative"}}>
             <TexButtons
@@ -805,11 +759,22 @@ function MathInput() {
 window.addEventListener("load",() => {
     const root = ReactDOM.createRoot(document.forms[0]);
     root.render(<>
-        <label><code>Topic:</code><input type="text" name="topic" size="4" style={{margin:'2px'}} defaultValue={<?php if (isset($post)) echo json_encode($post['topic']);?>}/></label><br/>
-        <label><code>Title:</code><input type="text" name="title" style={{margin:'2px'}} defaultValue={<?php if (isset($post)) echo json_encode($post['title']);?>}/></label><br/>
+        <label><code>Topic:</code><input type="text" name="topic" size="3" style={{margin:'2px',fontFamily:'monospace'}} defaultValue={<?php if (isset($post)) echo json_encode($post['topic']);else echo '""';?>}/></label><br/>
+        <label><code>Title:</code><input type="text" name="title" style={{margin:'2px'}} defaultValue={<?php if (isset($post)) echo json_encode($post['title']);else echo '""';?>}/></label><br/>
         <label><code>Input:</code>
         <MathInput/>
         </label><br/>
         <input type="Submit"/>
     </>);
 });
+function snackbar(text) {
+    var x = jQuery("<div>").addClass("snackbar").text(text);
+    jQuery("body").append(x);
+    x.animate({bottom: "30px"}, 200, function() {
+        setTimeout(function() {
+            x.animate({bottom: "0"}, 200, function() {
+                x.remove();
+            });
+        }, 2000);
+    });
+}
