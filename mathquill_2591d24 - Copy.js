@@ -2242,7 +2242,7 @@ Controller.open(function(_, super_) {
       return textBlock;
     });
     var escapedDollar = string('\\$').result('$');
-    var textChar = escapedDollar.or(regex(/^[^\$\\]+/)).map(function(text) {
+    var textChar = escapedDollar.or(string('\\')).or(regex(/^[^\$\\]+/)).map(function(text) {
       const textBlock = TextBlock();
       if (text.length === 0) return Fragment();
       TextPiece(text).adopt(textBlock, 0, 0);
