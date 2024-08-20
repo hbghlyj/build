@@ -2231,15 +2231,24 @@ Controller.open(function(_, super_) {
 
         return rootMathCommand;
       });
-
+    var textbf = string('\\textbf{').then(regex(/^[^\}]*/)).skip(string('}')).map(function(text) {
+      const textBlock = LatexCmds.textbf();
+      TextPiece(text).adopt(textBlock, 0, 0);
+      return textBlock;
+    });
+    var textit = string('\\textit{').then(regex(/^[^\}]*/)).skip(string('}')).map(function(text) {
+      const textBlock = LatexCmds.textit();
+      TextPiece(text).adopt(textBlock, 0, 0);
+      return textBlock;
+    });
     var escapedDollar = string('\\$').result('$');
-    var textChar = escapedDollar.or(regex(/^[^\$]+/)).map(function(text) {
+    var textChar = escapedDollar.or(regex(/^[^\$\\]+/)).map(function(text) {
       const textBlock = TextBlock();
       if (text.length === 0) return Fragment();
       TextPiece(text).adopt(textBlock, 0, 0);
       return textBlock;
     });
-    var latexText = mathMode.or(textChar).many();
+    var latexText = mathMode.or(textbf).or(textit).or(textChar).many();
     var commands = latexText.skip(eof).or(all.result(false)).parse(latex);
 
     if (commands) {
@@ -3294,8 +3303,6 @@ function makeTextBlock(latex, attrs) {
 
 LatexCmds.textit = makeTextBlock('\\textit', 'style="font-style:italic" class="mq-text-mode"');
 LatexCmds.textbf = makeTextBlock('\\textbf', 'style="font-weight:bold" class="mq-text-mode"');
-LatexCmds.textsf = makeTextBlock('\\textsf', 'class="mq-sans-serif mq-text-mode"');
-LatexCmds.texttt = makeTextBlock('\\texttt', 'class="mq-monospace mq-text-mode"');
 
 
 var RootMathCommand = P(MathCommand, function(_, super_) {
