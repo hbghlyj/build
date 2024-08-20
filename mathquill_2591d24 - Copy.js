@@ -1078,14 +1078,16 @@ function getInterface(v) {
     _.focus = function() { this.__controller.textarea.focus(); return this; };
     _.blur = function() { this.__controller.textarea.blur(); return this; };
     _.write = function(latex) {
-      this.__controller.writeLatex(latex);
+      const cursor = this.__controller.cursor;
+      if(cursor.parent.jQ.is(".mq-text-mode")){cursor.parent.write(cursor,latex);return this;}
+      else{this.__controller.writeLatex(latex);}
       this.__controller.handle('edit');
       this.__controller.scrollHoriz();
-      if (this.__controller.blurred) this.__controller.cursor.hide().parent.blur();
+      if (this.__controller.blurred) cursor.hide().parent.blur();
       return this;
     };
     _.empty = function() {
-      var root = this.__controller.root, cursor = this.__controller.cursor;
+      const root = this.__controller.root, cursor = this.__controller.cursor;
       root.eachChild('postOrder', 'dispose');
       root.ends[L] = root.ends[R] = 0;
       root.jQ.empty();
