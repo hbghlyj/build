@@ -1079,6 +1079,7 @@ function getInterface(v) {
     _.blur = function() { this.__controller.textarea.blur(); return this; };
     _.write = function(latex) {
       this.__controller.writeLatex(latex);
+      this.__controller.handle('edit');
       this.__controller.scrollHoriz();
       if (this.__controller.blurred) this.__controller.cursor.hide().parent.blur();
       return this;
@@ -1115,6 +1116,23 @@ function getInterface(v) {
           cmd.setClass(multimatch[2]);
         }
         if (cursor.selection) cmd.replaces(cursor.replaceSelection());
+          if(cursor && cursor.parent && cursor.parent.jQ.is(".mq-text-mode")) {// inside text mode
+            if (!cursor[R]) { // at right end of text block
+              cursor.insRightOf(cursor.parent);
+            } else if (!cursor[L]) { // at left end of text block
+              cursor.insLeftOf(cursor.parent);
+            } else { // split apart
+              var leftBlock = cursor.parent.constructor();// create a new TextBlock, preserving the current formatting (textit/textbf)
+              var leftPc = cursor.parent.ends[L];
+              leftPc.disown().jQ.detach();
+              leftPc.adopt(leftBlock, 0, 0);
+
+              cursor.insLeftOf(cursor.parent);
+              leftBlock.createLeftOf(cursor.show());
+              // Now cursor.parent is leftBlock
+              cursor.insRightOf(cursor.parent);
+            }
+          }
           cmd.createLeftOf(cursor.show());
           this.__controller.scrollHoriz();
           ctrlr.handle("edit");
@@ -1150,6 +1168,7 @@ function getInterface(v) {
             return this;
           default:
             cursor.clearSelection().show();
+            window.snackbar("You can't use that command in text mode.");
             return this;
         }
       }
@@ -2231,24 +2250,24 @@ Controller.open(function(_, super_) {
 
         return rootMathCommand;
       });
-    var textbf = string('\\textbf{').then(regex(/^[^\}]*/)).skip(string('}')).map(function(text) {
-      const textBlock = LatexCmds.textbf();
-      TextPiece(text).adopt(textBlock, 0, 0);
-      return textBlock;
-    });
-    var textit = string('\\textit{').then(regex(/^[^\}]*/)).skip(string('}')).map(function(text) {
-      const textBlock = LatexCmds.textit();
-      TextPiece(text).adopt(textBlock, 0, 0);
-      return textBlock;
+    var textCmd = string('\\').then(string('textbf').or(string('textit')).or(string('textcolor'))).then(function(ctrlSeq) {
+      var cmdKlass = LatexCmds[ctrlSeq];
+
+      if (cmdKlass) {
+        return cmdKlass(ctrlSeq).parser();
+      }
+      else {
+        return fail('unknown command: \\'+ctrlSeq);
+      }
     });
     var escapedDollar = string('\\$').result('$');
-    var textChar = escapedDollar.or(string('\\')).or(regex(/^[^\$\\]+/)).map(function(text) {
+    var textChar = escapedDollar.or(regex(/^[^\$\\]+/)).map(function(text) {
       const textBlock = TextBlock();
       if (text.length === 0) return Fragment();
       TextPiece(text).adopt(textBlock, 0, 0);
       return textBlock;
     });
-    var latexText = mathMode.or(textbf).or(textit).or(textChar).many();
+    var latexText = mathMode.or(textCmd).or(textChar).many();
     var commands = latexText.skip(eof).or(all.result(false)).parse(latex);
 
     if (commands) {

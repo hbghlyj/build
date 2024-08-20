@@ -767,7 +767,7 @@ window.addEventListener("load",() => {
         <input type="Submit"/>
     </>);
 });
-function snackbar(text) {
+window.snackbar = text => {
     var x = jQuery("<div>").addClass("snackbar").text(text);
     jQuery("body").append(x);
     x.animate({bottom: "30px"}, 200, function() {
