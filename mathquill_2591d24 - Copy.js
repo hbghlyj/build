@@ -2521,7 +2521,7 @@ Controller.open(function(_) {
       }
     }
     // If the user is in text mode, paste the raw text...
-    if(this.cursor && this.cursor.parent && this.cursor.parent.jQ.is(".mq-text-mode")) {
+    if(this.cursor && this.cursor.parent && this.cursor.parent.jQ.is(".mq-text-mode,.mq-root-block")) {
       this.typedText(text);
     } else {
       // Otherwise paste as LaTeX
