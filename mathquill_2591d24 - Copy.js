@@ -859,7 +859,7 @@ var Selection = P(Fragment, function(_, super_) {
       //can't do wrapAll(this.jQ = $(...)) because wrapAll will clone it
   };
   _.adopt = function() {
-    this.jQ.replaceWith(this.jQ = this.jQ.children());
+    this.jQ.replaceWith(this.jQ = this.jQ.contents());//.children() does not return text nodes; to get all children including text and comment nodes, use .contents().
     return super_.adopt.apply(this, arguments);
   };
   _.clear = function() {
@@ -1103,6 +1103,9 @@ function getInterface(v) {
       if(isTextColor.test(cmd)) {
         var multimatch = isTextColor.exec(cmd);
         var klass = multimatch[1];
+        if(klass === "textcolor"&&!cursor.parent.jQ.is(".mq-text-mode,.mq-root-block")) {// in math mode
+          kclass = "mathcolor"
+        }
         var cmd = LatexCmds[klass](klass);
         if(klass === "textcolor") {
           var left = cursor.selection && cursor.selection.ends[L];
@@ -3120,7 +3123,7 @@ var TextBlock = P(Node, function(_, super_) {
       super_.createLeftOf.call(leftBlock, cursor);
       RootMathCommand(cursor).createLeftOf(cursor);
     }
-      this.bubble('reflow');
+      // this.bubble('reflow');//don't call edit handler for programmatic changes(e.g. Undo/Redo), only for user input, to avoid infinite loops
   };
 
   _.seek = function(pageX, cursor) {
@@ -4411,6 +4414,37 @@ LatexCmds.textcolor = P(MathCommand, function(_, super_) {
   };
   _.latex = function() {
     return '\\textcolor{' + this.color + '}{' + this.blocks[0].latex() + '}';
+  };
+  _.parser = function() {
+    var self = this;
+    var optWhitespace = Parser.optWhitespace;
+    var string = Parser.string;
+    var regex = Parser.regex;
+
+    return optWhitespace
+      .then(string('{'))
+      .then(regex(/^[#\w\s.,()%-]*/))
+      .skip(string('}'))
+      .then(function(color) {
+        self.setColor(color);
+        return TextBlock.prototype.parser.call(self);
+      })
+    ;
+  };
+  _.isStyleBlock = function() {
+    return true;
+  };
+});
+
+// in math mode
+LatexCmds.mathcolor = P(MathCommand, function(_, super_) {
+  _.setColor = function(color) {
+    this.color = color;
+    this.htmlTemplate =
+      '<span class="mq-mathcolor" style="color:' + color + '">&0</span>';
+  };
+  _.latex = function() {
+    return '\\mathcolor{' + this.color + '}{' + this.blocks[0].latex() + '}';
   };
   _.parser = function() {
     var self = this;

@@ -648,7 +648,6 @@ function MathInput() {
         console.log((newContent === currentContent)?'nothing changed!':'new content: '+newContent);
         if (newContent === currentContent) return;
         const latestUndo = state['UNDO_STACK'].length > 0 ? state['UNDO_STACK'][0] : false;
-        if(latestUndo?.value===newContent) return;
         var editType;// "ADD" or "DELETE"
         var pos;// position of the add or delete
         var updateLastUndoAction = false;
@@ -704,7 +703,8 @@ function MathInput() {
         if(updateLastUndoAction) {
             state['UNDO_STACK'][0]=newUndo;
         } else {
-            state['UNDO_STACK'].unshift(newUndo);
+            if(latestUndo?.value !== currentContent)
+                state['UNDO_STACK'].unshift(newUndo);
         }
         inputRef.current.value=newContent;
         console.log('Undo stack:',state['UNDO_STACK'],'Redo stack:',state['REDO_STACK']);
