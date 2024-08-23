@@ -3552,30 +3552,30 @@ LatexCmds.bigtriangleup = bind(VanillaSymbol, '\\bigtriangleup ', '&#9651;');
 LatexCmds.ominus = bind(VanillaSymbol, '\\ominus ', '&#8854;');
 LatexCmds.uplus = bind(VanillaSymbol, '\\uplus ', '&#8846;');
 LatexCmds.bigtriangledown = bind(VanillaSymbol, '\\bigtriangledown ', '&#9661;');
-LatexCmds.sqcap = bind(VanillaSymbol, '\\sqcap ', '&#8851;');
-LatexCmds.triangleleft = bind(VanillaSymbol, '\\triangleleft ', '&#8882;');
-LatexCmds.sqcup = bind(VanillaSymbol, '\\sqcup ', '&#8852;');
-LatexCmds.triangleright = bind(VanillaSymbol, '\\triangleright ', '&#8883;');
+LatexCmds.sqcap = bind(BinaryOperator, '\\sqcap ', '&#8851;');
+LatexCmds.triangleleft = bind(BinaryOperator, '\\triangleleft ', '&#8882;');
+LatexCmds.sqcup = bind(BinaryOperator, '\\sqcup ', '&#8852;');
+LatexCmds.triangleright = bind(BinaryOperator, '\\triangleright ', '&#8883;');
 //circledot is not a not real LaTex command see https://github.com/mathquill/mathquill/pull/552 for more details
 LatexCmds.odot = LatexCmds.circledot = bind(VanillaSymbol, '\\odot ', '&#8857;');
 LatexCmds.bigcirc = bind(VanillaSymbol, '\\bigcirc ', '&#9711;');
 LatexCmds.dagger = bind(VanillaSymbol, '\\dagger ', '&#0134;');
 LatexCmds.ddagger = bind(VanillaSymbol, '\\ddagger ', '&#135;');
-LatexCmds.wr = bind(VanillaSymbol, '\\wr ', '&#8768;');
-LatexCmds.amalg = bind(VanillaSymbol, '\\amalg ', '&#8720;');
+LatexCmds.wr = bind(BinaryOperator, '\\wr ', '&#8768;');
+LatexCmds.amalg = bind(BinaryOperator, '\\amalg ', '&#8720;');
 
 //relationship symbols
-LatexCmds.models = bind(VanillaSymbol, '\\models ', '&#8872;');
-LatexCmds.prec = bind(VanillaSymbol, '\\prec ', '&#8826;');
-LatexCmds.succ = bind(VanillaSymbol, '\\succ ', '&#8827;');
-LatexCmds.preceq = bind(VanillaSymbol, '\\preceq ', '&#8828;');
-LatexCmds.succeq = bind(VanillaSymbol, '\\succeq ', '&#8829;');
-LatexCmds.simeq = bind(VanillaSymbol, '\\simeq ', '&#8771;');
-LatexCmds.mid = bind(VanillaSymbol, '\\mid ', '&#8739;');
-LatexCmds.ll = bind(VanillaSymbol, '\\ll ', '&#8810;');
-LatexCmds.gg = bind(VanillaSymbol, '\\gg ', '&#8811;');
-LatexCmds.parallel = bind(VanillaSymbol, '\\parallel ', '&#8741;');
-LatexCmds.nparallel = bind(VanillaSymbol, '\\nparallel ', '&#8742;');
+LatexCmds.models = bind(BinaryOperator, '\\models ', '&#8872;');
+LatexCmds.prec = bind(BinaryOperator, '\\prec ', '&#8826;');
+LatexCmds.succ = bind(BinaryOperator, '\\succ ', '&#8827;');
+LatexCmds.preceq = bind(BinaryOperator, '\\preceq ', '&#8828;');
+LatexCmds.succeq = bind(BinaryOperator, '\\succeq ', '&#8829;');
+LatexCmds.simeq = bind(BinaryOperator, '\\simeq ', '&#8771;');
+LatexCmds.mid = bind(BinaryOperator, '\\mid ', '&#8739;');
+LatexCmds.ll = bind(BinaryOperator, '\\ll ', '&#8810;');
+LatexCmds.gg = bind(BinaryOperator, '\\gg ', '&#8811;');
+LatexCmds.parallel = bind(BinaryOperator, '\\parallel ', '&#8741;');
+LatexCmds.nparallel = bind(BinaryOperator, '\\nparallel ', '&#8742;');
 LatexCmds.bowtie = bind(VanillaSymbol, '\\bowtie ', '&#8904;');
 LatexCmds.sqsubset = bind(VanillaSymbol, '\\sqsubset ', '&#8847;');
 LatexCmds.sqsupset = bind(VanillaSymbol, '\\sqsupset ', '&#8848;');
@@ -3586,8 +3586,8 @@ LatexCmds.doteq = bind(VanillaSymbol, '\\doteq ', '&#8784;');
 LatexCmds.frown = bind(VanillaSymbol, '\\frown ', '&#8994;');
 LatexCmds.vdash = bind(VanillaSymbol, '\\vdash ', '&#8870;');
 LatexCmds.dashv = bind(VanillaSymbol, '\\dashv ', '&#8867;');
-LatexCmds.nless = bind(VanillaSymbol, '\\nless ', '&#8814;');
-LatexCmds.ngtr = bind(VanillaSymbol, '\\ngtr ', '&#8815;');
+LatexCmds.nless = bind(BinaryOperator, '\\nless ', '&#8814;');
+LatexCmds.ngtr = bind(BinaryOperator, '\\ngtr ', '&#8815;');
 
 //arrows
 LatexCmds.longleftarrow = bind(VanillaSymbol, '\\longleftarrow ', '&#8592;');
