@@ -13,7 +13,6 @@
   src: local("Symbola Regular"), local("Symbola"), url(fonts/Symbola.woff2) format("woff2"), url(fonts/Symbola.woff) format("woff"), url(fonts/Symbola.ttf) format("truetype"), url(fonts/Symbola.svg#Symbola) format("svg");
 }
 .mq-editable-field {
-  display: -moz-inline-box;
   display: inline-block;
 }
 .mq-editable-field .mq-cursor {
@@ -22,7 +21,6 @@
   position: relative;
   z-index: 1;
   padding: 0;
-  display: -moz-inline-box;
   display: inline-block;
 }
 .mq-editable-field .mq-cursor.mq-blink {
@@ -75,37 +73,31 @@
   overflow-x: auto;
   overflow-y: hidden;
 }
-.mq-root-block,
-.mq-math-mode .mq-root-block {
-  display: -moz-inline-box;
+.mq-root-block {
   display: inline-block;
   width: 100%;
   padding: 2px;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
-  white-space: pre;
   overflow: hidden;
-  vertical-align: middle;
+  white-space: pre-wrap;
 }
 .mq-math-mode {
+  white-space: pre;
   font-variant: normal;
   font-weight: normal;
   font-style: normal;
   font-size: 115%;
   line-height: 1;
-  display: -moz-inline-box;
   display: inline-block;
 }
 .mq-math-mode .mq-non-leaf,
 .mq-math-mode .mq-scaled {
-  display: -moz-inline-box;
   display: inline-block;
 }
 .mq-math-mode var,
 .mq-math-mode .mq-text-mode,
 .mq-math-mode .mq-nonSymbola {
-  font-family: "Times New Roman", Symbola, serif;
+  font-family: serif;
   line-height: 0.9;
 }
 .mq-math-mode * {
@@ -130,7 +122,6 @@
 }
 .mq-math-mode .mq-text-mode {
   display: inline-block;
-  white-space: pre;
 }
 .mq-math-mode .mq-text-mode.mq-hasCursor {
   box-shadow: inset darkgray 0 0.1em 0.2em;
@@ -203,7 +194,6 @@
 }
 .mq-math-mode .mq-binary-operator {
   padding: 0 0.2em;
-  display: -moz-inline-box;
   display: inline-block;
 }
 .mq-math-mode .mq-supsub {
@@ -240,11 +230,7 @@
 }
 .mq-math-mode .mq-paren {
   padding: 0 0.1em;
-  vertical-align: top;
-  -webkit-transform-origin: center 0.06em;
-  -moz-transform-origin: center 0.06em;
-  -ms-transform-origin: center 0.06em;
-  -o-transform-origin: center 0.06em;
+  /* vertical-align: top; */
   transform-origin: center 0.06em;
 }
 .mq-math-mode .mq-paren.mq-ghost {
@@ -408,7 +394,6 @@
 }
 .mq-math-mode .mq-stackrel {
   display: -webkit-inline-box;
-  display: -moz-inline-box;
   display: -ms-inline-flexbox;
   display: -webkit-inline-flex;
   display: inline-flex;
@@ -601,7 +586,6 @@
 }
 .mq-math-mode .mq-matrixed {
   background: white;
-  display: -moz-inline-box;
   display: inline-block;
 }
 .mq-math-mode .mq-matrixed-container {

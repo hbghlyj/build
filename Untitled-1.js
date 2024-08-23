@@ -7,18 +7,16 @@ import MathQuillv1 from "/build/mathquill_2591d24 - Copy.js";
 window.MathQuill = MathQuillv1.getInterface(2);
 const symbolGroups = {
     BASIC : [
-        {toType:"+", tex:"+"},
-        {toType:"-", tex:"-"},
-        {toType:"* (asterisk)", tex:"\\cdot"},
+        {toType:"⋅", tex:"\\cdot"},
+        {toType:"•", tex:"\\bullet"},
+        {toType:"∘", tex:"\\circ"},
         {toType:"×", tex:"\\times"},
-        {toType:"÷", tex:"\\div"},
         {toType:"/", tex:"\\frac{a}{b}", description:"fraction", editorCommands: input => {
             input.typedText("/");
         }},
-        {toType:"=", tex:"="},
         {toType:"≠", tex:"\\neq"},
-        {toType:"≈", tex:"\\approx"},
-        {toType:"π", tex:"\\pi"},
+        {toType:"≅", tex:"\\cong"},
+        {toType:"≃", tex:"\\simeq"},
         {toType:"sqrt", tex:"\\sqrt{x}", editorCommands: input => {
             input.cmd("\\sqrt");
         }},
@@ -50,7 +48,6 @@ const symbolGroups = {
         {toType:"<", tex:"<"},
         {toType:"≤", tex:"\\le"},
         {toType:"±", tex:"\\pm"},
-        {toType:"∘", description: "function composition", tex:"\\circ"},
         {toType:"(", tex:"(", editorCommands: input => {
             input.typedText("(");
         }},
@@ -636,7 +633,6 @@ function MathInput() {
             // TODO - make xi accessible in, prevents typing "x in"
             // TODO - "in" as auto-symbol prevents typing int
             autoCommands: 'subset superset union intersect forall therefore exists alpha beta gamma Gamma delta epsilon digamma zeta eta theta iota kappa lambda xikappa lambda omicron pi rho varrho sigma Sigma tau upsilon Upsilon omega sqrt sum int',
-            autoSubscriptNumerals: true,
             substituteTextarea: function() {
                 return Textarea.current;
             },
@@ -737,7 +733,7 @@ function MathInput() {
         }}>
         <div style={{overflow: 'auto', display: 'inline-block'}}>
             <textarea ref={Textarea} onFocus={()=>setFocus(true)} onBlur={e=>{if(!e.target.parentNode.parentNode.parentNode.parentNode.contains(e.relatedTarget))setFocus(false)}} />
-            <span ref={spanRef} style={{minWidth:'200px',padding:'5px',margin:'2px'}}/>
+            <span ref={spanRef} style={{minWidth:'200px',maxWidth:'7in',padding:'5px',margin:'2px'}}/>
             <input ref={inputRef} name="latex" type="hidden"/>
         </div>
         {focused&&<div style={{position: "relative"}}>
@@ -758,13 +754,14 @@ function MathInput() {
 }
 window.addEventListener("load",() => {
     const root = ReactDOM.createRoot(document.forms[0]);
+    document.forms[0].onsubmit = function() {this.action = encodeURI(location.origin+'/draft.php/'+this.title.value);};
     root.render(<>
-        <label><code>Topic:</code><input type="text" name="topic" size="3" style={{margin:'2px',fontFamily:'monospace'}} defaultValue={<?php if (isset($post)) echo json_encode($post['topic']);else echo '""';?>}/></label><br/>
+        <label><code>Topic:</code><input type="text" name="topic" size="4" style={{margin:'2px',fontFamily:'monospace'}} defaultValue={<?php if (isset($post)) echo json_encode($post['topic']);else echo '""';?>}/></label><br/>
         <label><code>Title:</code><input type="text" name="title" style={{margin:'2px'}} defaultValue={<?php if (isset($post)) echo json_encode($post['title']);else echo '""';?>}/></label><br/>
-        <label><code>Input:</code>
+        <label><code>Value:</code>
         <MathInput/>
         </label><br/>
-        <input type="Submit"/>
+        <button type="Submit" style={{borderWidth: "1pt 2px 2px 1pt",background: "linear-gradient(#fff, #ccc)"}}>Save Button</button>
     </>);
 });
 window.snackbar = text => {
