@@ -761,7 +761,7 @@ window.addEventListener("load",() => {
         <label><code>Value:</code>
         <MathInput/>
         </label><br/>
-        <button type="Submit" style={{borderWidth: "1pt 2px 2px 1pt",background: "linear-gradient(#fff, #ccc)"}}>Save Button</button>
+        <button type="Submit" style={{border:"outset #e3e3e3",borderWidth: "1pt 2px 2px 1pt",background: "linear-gradient(#fff, #ccc)"}}>Save Button</button>
     </>);
 });
 window.snackbar = text => {
@@ -774,4 +774,4 @@ window.snackbar = text => {
             });
         }, 2000);
     });
-}
+};

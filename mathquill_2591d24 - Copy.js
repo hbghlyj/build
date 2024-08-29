@@ -2495,6 +2495,7 @@ Controller.open(function(_) {
   _.typedText = function(ch) {
     var cursor = this.notify().cursor;
     cursor.parent.write(cursor, ch);
+    cursor.parent.bubble('reflow');
     this.scrollHoriz();
   };
   _.cut = function() {
