@@ -756,9 +756,9 @@ window.addEventListener("load",() => {
     const root = ReactDOM.createRoot(document.forms[0]);
     document.forms[0].onsubmit = function() {this.action = encodeURI(location.origin+'/draft.php/'+this.title.value);};
     root.render(<>
-        <label><code>Topic:</code><input type="text" name="topic" size="4" style={{margin:'2px',fontFamily:'monospace'}} defaultValue={<?php if (isset($post)) echo json_encode($post['topic']);else echo '""';?>}/></label><br/>
-        <label><code>Title:</code><input type="text" name="title" style={{margin:'2px'}} defaultValue={<?php if (isset($post)) echo json_encode($post['title']);else echo '""';?>}/></label><br/>
-        <label><code>Value:</code>
+        <label>Topic:<input type="text" name="topic" size="4" style={{margin:'2px',fontFamily:'monospace'}} defaultValue={<?php if (isset($post)) echo json_encode($post['topic']);else echo '""';?>}/></label><br/>
+        <label>Title:<input type="text" name="title" style={{margin:'2px'}} defaultValue={<?php if (isset($post)) echo json_encode($post['title']);else echo '""';?>}/></label><br/>
+        <label>Input:
         <MathInput/>
         </label><br/>
         <button type="Submit" style={{border:"outset #e3e3e3",borderWidth: "1pt 2px 2px 1pt",background: "linear-gradient(#fff, #ccc)"}}>Save Button</button>

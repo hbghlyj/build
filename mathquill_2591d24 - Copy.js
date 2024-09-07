@@ -2369,7 +2369,7 @@ Controller.open(function(_) {
     // seek from root, which is less accurate (e.g. fraction)
     cursor.clearSelection().show();
 
-    node.seek(pageX, cursor);
+    node.seek(pageX, cursor, pageY);
     this.scrollHoriz(); // before .selectFrom when mouse-selecting, so
                         // always hits no-selection case in scrollHoriz and scrolls slower
     return this;
@@ -3127,16 +3127,26 @@ var TextBlock = P(Node, function(_, super_) {
       // this.bubble('reflow');//don't call edit handler for programmatic changes(e.g. Undo/Redo), only for user input, to avoid infinite loops
   };
 
-  _.seek = function(pageX, cursor) {
+  _.seek = function(pageX, cursor, pageY) {
     cursor.hide();
-    var textPc = fuseChildren(this);
+    const textPc = fuseChildren(this);
+    const range = document.createRange();
+    range.selectNode(textPc.dom);
+    let rect;
+    let lengthOfTextBefore = 0;
+    var avgChWidth = 1126/2048*16//average char width of Consolas 16px computed by https://stackoverflow.com/questions/19113725/what-dependency-between-font-size-and-width-of-char-in-monospace-font
+    for(rect of range.getClientRects()){
+      if(rect.left <= pageX && pageX <= rect.right && rect.top <= pageY && pageY <= rect.bottom){
+        break;
+      }
+      lengthOfTextBefore += Math.round(rect.width / avgChWidth);
+    }
 
     // insert cursor at approx position in DOMTextNode
-    var avgChWidth = this.jQ.width()/this.text.length;
-    var approxPosition = Math.round((pageX - this.jQ.offset().left)/avgChWidth);
+    var approxPosition = Math.round((pageX - rect.left)/avgChWidth);
     if (approxPosition <= 0) cursor.insAtLeftEnd(this);
     else if (approxPosition >= textPc.text.length) cursor.insAtRightEnd(this);
-    else cursor.insLeftOf(textPc.splitRight(approxPosition));
+    else cursor.insLeftOf(textPc.splitRight(lengthOfTextBefore + approxPosition));
 
     // move towards mousedown (pageX)
     var displ = pageX - cursor.show().offset().left; // displacement
