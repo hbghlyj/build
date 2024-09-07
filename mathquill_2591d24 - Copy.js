@@ -3134,7 +3134,7 @@ var TextBlock = P(Node, function(_, super_) {
     range.selectNode(textPc.dom);
     let rect;
     let lengthOfTextBefore = 0;
-    var avgChWidth = 1126/2048*16//average char width of Consolas 16px computed by https://stackoverflow.com/questions/19113725/what-dependency-between-font-size-and-width-of-char-in-monospace-font
+    const avgChWidth = 1126/2048*16//average char width of Consolas 16px computed by https://stackoverflow.com/questions/19113725/what-dependency-between-font-size-and-width-of-char-in-monospace-font
     for(rect of range.getClientRects()){
       if(pageY <= rect.bottom){
         break;
@@ -3143,10 +3143,10 @@ var TextBlock = P(Node, function(_, super_) {
     }
 
     // insert cursor at approx position in DOMTextNode
-    var approxPosition = Math.round((pageX - rect.left)/avgChWidth);
+    const approxPosition = lengthOfTextBefore + Math.round((pageX - rect.left) / avgChWidth);
     if (approxPosition <= 0) cursor.insAtLeftEnd(this);
     else if (approxPosition >= textPc.text.length) cursor.insAtRightEnd(this);
-    else cursor.insLeftOf(textPc.splitRight(lengthOfTextBefore + approxPosition));
+    else cursor.insLeftOf(textPc.splitRight(approxPosition));
 
     // move towards mousedown (pageX)
     var displ = pageX - cursor.show().offset().left; // displacement
