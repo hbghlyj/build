@@ -3136,7 +3136,7 @@ var TextBlock = P(Node, function(_, super_) {
     let lengthOfTextBefore = 0;
     var avgChWidth = 1126/2048*16//average char width of Consolas 16px computed by https://stackoverflow.com/questions/19113725/what-dependency-between-font-size-and-width-of-char-in-monospace-font
     for(rect of range.getClientRects()){
-      if(rect.left <= pageX && pageX <= rect.right && rect.top <= pageY && pageY <= rect.bottom){
+      if(pageY <= rect.bottom){
         break;
       }
       lengthOfTextBefore += Math.round(rect.width / avgChWidth);
